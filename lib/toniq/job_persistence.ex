@@ -1,5 +1,8 @@
 defmodule Toniq.JobPersistence do
   import Exredis.Api
+  require Exredis
+
+  @load_jobs_timeout 30_000
 
   @doc """
   Stores a job in redis. If it does not succeed it will fail right away.
@@ -107,7 +110,7 @@ defmodule Toniq.JobPersistence do
 
   defp load_jobs(redis_key, identifier) do
     redis
-    |> smembers(redis_key)
+    |> Exredis.query(["SMEMBERS", redis_key], @load_jobs_timeout)
     |> Enum.map(&build_job/1)
     |> Enum.sort(&first_in_first_out/2)
     |> Enum.map(fn (job) -> convert_to_latest_job_format(job, redis_key) end)
