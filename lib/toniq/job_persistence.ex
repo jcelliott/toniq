@@ -2,7 +2,7 @@ defmodule Toniq.JobPersistence do
   import Exredis.Api
   require Exredis
 
-  @load_jobs_timeout 30_000
+  @load_jobs_timeout 120_000
 
   @doc """
   Stores a job in redis. If it does not succeed it will fail right away.
