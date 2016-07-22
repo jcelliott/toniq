@@ -9,7 +9,7 @@ defmodule Toniq.KeepalivePersistence do
   end
 
   def registered_vms do
-    redis_query(["SMEMBERS", registered_vms_key])
+    redis_query(["SMEMBERS", registered_vms_key], 30_000)
   end
 
   def alive?(identifier) do
@@ -64,7 +64,7 @@ defmodule Toniq.KeepalivePersistence do
 
       # Execute transaction
       ["EXEC"]
-    ])
+    ], 30_000)
   end
 
   # Added so we could use it to default scope further out when we want to allow custom persistance scopes in testing.
@@ -82,8 +82,8 @@ defmodule Toniq.KeepalivePersistence do
     Toniq.JobPersistence.failed_jobs_key(identifier)
   end
 
-  defp redis_query(query) do
-    redis |> Exredis.query(query)
+  defp redis_query(query, timeout \\ 5000) do
+    redis |> Exredis.query(query, timeout)
   end
 
   defp redis do
